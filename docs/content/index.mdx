@@ -1,0 +1,82 @@
+---
+title: Introduction
+slug: /
+---
+
+# propeller-v2-cms-react
+
+CMS page renderer + block dispatcher + adapter provider for Propeller
+Commerce React shops.
+
+This package is the **rendering + provider layer**. The actual CMS adapter
+(Strapi, Sanity, etc.) ships as a separate `propeller-v2-cms-adapter-*`
+package, which you install alongside this one. The framework-agnostic
+`CmsAdapter` contract lives in
+[`propeller-v2-core-ui`](https://propeller-commerce.github.io/propeller-v2-core-ui/).
+
+## What's here
+
+- **[`<CmsAdapterProvider>`](/provider)** — wires a `CmsAdapter` instance
+  into the React tree.
+- **[`useCms()`](/use-cms)** — reads the adapter from context, for client
+  components that need optional CMS access.
+- **[`<CmsPageRenderer>`](/page-renderer)** — renders a `CmsPage`'s block
+  list with a per-block renderer map.
+- **[`<CmsBlock>`](/block)** — single-block dispatcher; the building block
+  the page renderer calls per item.
+
+## Mode-of-operation
+
+```tsx
+import { CmsAdapterProvider, CmsPageRenderer } from 'propeller-v2-cms-react';
+import { createStrapiAdapter } from 'propeller-v2-cms-adapter-strapi';
+
+const adapter = createStrapiAdapter({ endpoint: process.env.CMS_URL! });
+
+function App({ children }) {
+  return (
+    <CmsAdapterProvider adapter={adapter}>
+      {children}
+    </CmsAdapterProvider>
+  );
+}
+
+// In a page:
+function CmsPage({ page }) {
+  return (
+    <CmsPageRenderer
+      page={page}
+      renderers={{
+        hero: (block) => <HeroBlock data={block.data} />,
+        text: (block) => <TextBlock data={block.data} />,
+      }}
+    />
+  );
+}
+```
+
+## Why no built-in blocks?
+
+Block component styling, layout, and content shape vary too much between
+shops to share. This package ships the **dispatcher**, the renderer, and
+the provider — not the blocks themselves. Register whatever your CMS
+emits via the `renderers` map.
+
+The accelerator shop templates ship a small default block set
+(`<HeroBlock>`, `<TextBlock>`, `<ImageBlock>`, `<ProductCarouselBlock>`)
+as a starting point shops can edit or replace freely.
+
+## Pair with
+
+- [`propeller-v2-core-ui`](https://propeller-commerce.github.io/propeller-v2-core-ui/)
+  — the framework-agnostic `CmsAdapter` contract.
+- [`propeller-v2-react-ui`](https://propeller-commerce.github.io/propeller-v2-react-ui/)
+  — the commerce components (cart, checkout, catalog).
+- [`propeller-v2-cms-vue`](https://propeller-commerce.github.io/propeller-v2-cms-vue/)
+  — the Vue mirror of this package.
+
+## Status
+
+The package is **pre-1.0** (`0.x`). Public API may change between minor
+versions until it stabilises; breaking changes are called out in
+[the changelog](/changelog).

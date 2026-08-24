@@ -1,0 +1,121 @@
+---
+title: Patterns
+sidebar_position: 7
+---
+
+# Patterns
+
+Recipes that come up in real shops.
+
+## Homepage fallback
+
+The Propeller convention for a CMS-driven homepage: if the adapter
+returns `null`, render a built-in `<HomeFallback>` instead. This lets a
+shop launch without a CMS and add one later without touching the
+homepage route.
+
+```tsx
+// app/page.tsx — Next.js App Router
+import { CmsPageRenderer } from 'propeller-v2-cms-react';
+import { HomeFallback } from '@/components/home/HomeFallback';
+import { adapter } from '@/lib/cms';
+import { cmsRenderers } from '@/cms/renderers';
+
+export default async function Home() {
+  const page = await adapter.getPage('home');
+  if (!page) return <HomeFallback />;
+  return <CmsPageRenderer page={page} renderers={cmsRenderers} />;
+}
+```
+
+The non-homepage CMS catch-all route uses the opposite convention: if
+the adapter returns `null`, call `notFound()`. There is no generic
+"page-not-found-in-CMS" fallback.
+
+## Catch-all route
+
+```tsx
+// app/(cms)/[...slug]/page.tsx
+import { notFound } from 'next/navigation';
+import { CmsPageRenderer } from 'propeller-v2-cms-react';
+import { adapter } from '@/lib/cms';
+import { cmsRenderers } from '@/cms/renderers';
+
+export default async function CmsPage({
+  params,
+}: {
+  params: { slug: string[] };
+}) {
+  const slug = params.slug.join('/');
+  const page = await adapter.getPage(slug);
+  if (!page) notFound();
+  return <CmsPageRenderer page={page} renderers={cmsRenderers} />;
+}
+```
+
+## No CMS configured
+
+A shop without a CMS still wraps the tree with `<CmsAdapterProvider
+adapter={null}>` so client islands using `useCms()` are safe. The
+homepage gets `<HomeFallback>`, and the catch-all route either is not
+mounted at all or returns 404 for every slug.
+
+## Preview mode
+
+The Strapi adapter (and most others) accept a `preview: true` option.
+Wire two adapter instances — one preview, one published — and pick
+which one to use based on a preview cookie:
+
+```ts
+// lib/cms.ts
+import { cookies } from 'next/headers';
+
+const publishedAdapter = createStrapiAdapter({ endpoint, preview: false });
+const previewAdapter   = createStrapiAdapter({ endpoint, preview: true });
+
+export function getAdapter() {
+  const isPreview = cookies().get('cms-preview')?.value === '1';
+  return isPreview ? previewAdapter : publishedAdapter;
+}
+```
+
+Then use `getAdapter()` instead of a singleton `adapter` import in your
+routes. The client-side `useCms()` hook should still receive the
+published adapter — preview state is server-only.
+
+## Multi-locale
+
+Pass `locale` through to `adapter.getPage`:
+
+```tsx
+export default async function CmsPage({
+  params,
+}: {
+  params: { locale: string; slug: string[] };
+}) {
+  const page = await adapter.getPage(params.slug.join('/'), {
+    locale: params.locale,
+  });
+  if (!page) notFound();
+  return <CmsPageRenderer page={page} renderers={cmsRenderers} />;
+}
+```
+
+The adapter is responsible for falling back to a default locale if the
+exact one isn't published; the renderer just consumes whatever shape
+comes back.
+
+## Per-block data fetching
+
+Block components are free to fetch their own data — `<CmsPageRenderer>`
+does **not** orchestrate child data:
+
+```tsx
+function ProductCarouselBlock({ data }: { data: { skus: string[] } }) {
+  const products = useProducts(data.skus);          // your own hook
+  if (!products) return <CarouselSkeleton />;
+  return <Carousel items={products} />;
+}
+```
+
+This keeps the renderer pure and lets blocks evolve independently.

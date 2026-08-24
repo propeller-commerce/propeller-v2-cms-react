@@ -1,0 +1,69 @@
+---
+title: CmsPageRenderer
+sidebar_label: Page renderer
+sidebar_position: 4
+---
+
+# `<CmsPageRenderer>`
+
+Renders a `CmsPage`'s block list. Each block is dispatched through the
+`renderers` map by its `block.type` discriminator.
+
+```tsx
+import { CmsPageRenderer } from 'propeller-v2-cms-react';
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+|---|---|---|---|
+| `page` | `CmsPage` | yes | The page object returned by `adapter.getPage(slug)`. |
+| `renderers` | `Record<string, CmsBlockRenderer>` | yes | Map keyed by `block.type`. |
+| `fallback` | `(block) => ReactNode` | no | Renders blocks whose `type` is not in `renderers`. Default: `null`. |
+| `className` | `string` | no | Applied to the outer wrapper `<div>`. |
+
+```ts
+type CmsBlockRenderer = (block: CmsBlock) => ReactNode;
+```
+
+## Example
+
+```tsx
+<CmsPageRenderer
+  page={page}
+  renderers={{
+    hero: (b) => <HeroBlock data={b.data} />,
+    text: (b) => <TextBlock html={b.data.html} />,
+    image: (b) => <ImageBlock src={b.data.src} alt={b.data.alt} />,
+    productCarousel: (b) => <ProductCarouselBlock skus={b.data.skus} />,
+  }}
+  fallback={(b) => {
+    if (process.env.NODE_ENV !== 'production') {
+      return <div className="cms-unknown">Unknown block type: {b.type}</div>;
+    }
+    return null;
+  }}
+/>
+```
+
+## What it does NOT do
+
+- **No client-side fetching.** The page must already be loaded.
+  Server-fetch on the route and pass it in as a prop. Client-side
+  fetching is the consumer's call — see
+  [`useCms()`](/use-cms).
+- **No block-level loading or error states.** Blocks are synchronous
+  renders. If a block needs to fetch its own data (a product carousel
+  hitting the commerce API), that's the block component's
+  responsibility.
+- **No layout opinions.** Blocks render in document order inside a
+  single wrapper `<div>`. Apply your own CSS / layout primitives in
+  the block components themselves.
+
+## Wrapping behaviour
+
+The output is a single `<div>` with the optional `className`, then one
+child per block. The block components themselves render whatever
+fragments / wrappers they want. If you need block-level wrappers
+(rails, sections), build them into each block component — the page
+renderer is intentionally thin.

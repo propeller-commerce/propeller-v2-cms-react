@@ -1,0 +1,61 @@
+---
+title: useCms
+sidebar_label: useCms
+sidebar_position: 6
+---
+
+# `useCms()`
+
+Reads the `CmsAdapter` from React context. Returns the adapter (or
+`null` when the provider was given `null`).
+
+```tsx
+import { useCms } from 'propeller-v2-cms-react';
+
+const cms = useCms();
+//    ^^ CmsAdapter | null
+```
+
+## When to use
+
+Client islands that need **optional** access to the adapter — e.g.
+preview banners, draft-mode toggles, "edit in CMS" links. Anything
+fetched on the **server** should call the adapter directly, not through
+this hook (a server component can't use context).
+
+## Outside the provider
+
+If a component calling `useCms()` is not inside a `<CmsAdapterProvider>`,
+the hook returns `null`. It does **not** throw — the contract is "this
+shop may not have a CMS configured", and that's a valid state.
+
+## Patterns
+
+### Hide UI when no CMS is wired
+
+```tsx
+function PreviewBanner() {
+  const cms = useCms();
+  if (!cms) return null;
+  return <div>Preview mode active</div>;
+}
+```
+
+### Fetch on the client when the page slug is dynamic
+
+```tsx
+function CmsSnippet({ slug }: { slug: string }) {
+  const cms = useCms();
+  const [page, setPage] = useState<CmsPage | null>(null);
+  useEffect(() => {
+    if (!cms) return;
+    cms.getPage(slug).then(setPage).catch(() => setPage(null));
+  }, [cms, slug]);
+  if (!page) return null;
+  return <CmsPageRenderer page={page} renderers={cmsRenderers} />;
+}
+```
+
+In Next.js App Router shops, prefer fetching on the server route and
+passing the page in as a prop. Client fetches add a waterfall and skip
+the framework's built-in caching.

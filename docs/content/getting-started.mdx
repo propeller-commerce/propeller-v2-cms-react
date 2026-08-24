@@ -1,0 +1,102 @@
+---
+title: Getting started
+sidebar_position: 2
+---
+
+# Getting started
+
+## Install
+
+```bash
+npm install \
+  github:propeller-commerce/propeller-v2-cms-react#master \
+  github:propeller-commerce/propeller-v2-core-ui#master \
+  github:propeller-commerce/propeller-sdk-v2#master
+```
+
+Plus a CMS adapter package. For Strapi:
+
+```bash
+npm install --install-links file:../propeller-v2-accelerator/packages/cms-adapter-strapi
+```
+
+(Once the adapter packages are published to npm, this becomes
+`npm install propeller-v2-cms-adapter-strapi`.)
+
+## Wire the provider
+
+At the React root, alongside whatever Propeller-UI provider you already
+have:
+
+```tsx
+// app/providers.tsx (Next.js) or src/main.tsx (Vite/CRA)
+'use client';
+import { CmsAdapterProvider } from 'propeller-v2-cms-react';
+import { createStrapiAdapter } from 'propeller-v2-cms-adapter-strapi';
+
+const adapter = createStrapiAdapter({
+  endpoint: process.env.NEXT_PUBLIC_CMS_URL!,
+  token: process.env.NEXT_PUBLIC_CMS_TOKEN,
+});
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <CmsAdapterProvider adapter={adapter}>
+      {/* …other providers… */}
+      {children}
+    </CmsAdapterProvider>
+  );
+}
+```
+
+If the shop has no CMS configured, pass `adapter={null}` — see
+[Patterns](/patterns#no-cms-configured).
+
+## Fetch and render a page
+
+Server-side (recommended — keeps content cacheable):
+
+```tsx
+// app/(cms)/[...slug]/page.tsx — Next.js App Router
+import { CmsPageRenderer } from 'propeller-v2-cms-react';
+import { adapter } from '@/lib/cms';            // server-only instance
+import { notFound } from 'next/navigation';
+import { HeroBlock, TextBlock } from '@/components/cms';
+
+export default async function Page({ params }: { params: { slug: string[] } }) {
+  const slug = params.slug.join('/');
+  const page = await adapter.getPage(slug);
+  if (!page) notFound();
+
+  return (
+    <CmsPageRenderer
+      page={page}
+      renderers={{
+        hero: (b) => <HeroBlock data={b.data} />,
+        text: (b) => <TextBlock data={b.data} />,
+      }}
+    />
+  );
+}
+```
+
+Client-side via `useCms()`:
+
+```tsx
+'use client';
+import { useCms } from 'propeller-v2-cms-react';
+
+export function PreviewBanner() {
+  const cms = useCms();
+  if (!cms) return null;        // no adapter wired
+  // optionally call cms.getGlobals() etc.
+}
+```
+
+## Read next
+
+- **[Provider](/provider)** — the `<CmsAdapterProvider>` API.
+- **[Page renderer](/page-renderer)** — the `<CmsPageRenderer>` API.
+- **[Block dispatcher](/block)** — `<CmsBlock>` for individual blocks.
+- **[Patterns](/patterns)** — homepage fallback, preview mode,
+  no-CMS shops, multi-locale.

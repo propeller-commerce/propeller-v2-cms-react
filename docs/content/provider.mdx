@@ -1,0 +1,66 @@
+---
+title: CmsAdapterProvider
+sidebar_label: Provider
+sidebar_position: 3
+---
+
+# `<CmsAdapterProvider>`
+
+Wires a `CmsAdapter` instance into the React tree.
+
+```tsx
+import { CmsAdapterProvider } from 'propeller-v2-cms-react';
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+|---|---|---|---|
+| `adapter` | `CmsAdapter \| null` | yes | Pass `null` for shops without a CMS. |
+| `children` | `ReactNode` | yes | Wrap whatever subtree needs `useCms()`. |
+
+The `CmsAdapter` interface is defined in
+[`propeller-v2-core-ui`](https://propeller-commerce.github.io/propeller-v2-core-ui/types#cmsadapter-contract).
+
+## Placement
+
+At the React root, **alongside** `<PropellerDepsProvider>` (or your own
+top-level providers). Order is not significant — the CMS provider has no
+dependency on the commerce one.
+
+```tsx
+<PropellerDepsProvider deps={deps}>
+  <CmsAdapterProvider adapter={cms}>
+    {children}
+  </CmsAdapterProvider>
+</PropellerDepsProvider>
+```
+
+## SSR safety
+
+The provider holds no mutable state — the adapter reference is captured
+on first render and never replaced. In Next.js App Router shops, place
+the provider in a Client Component (e.g. `app/providers.tsx` with
+`'use client'`). The adapter instance can still be constructed on the
+server and passed in via props.
+
+## Passing `null`
+
+A shop that wants to ship without a CMS still wraps the tree:
+
+```tsx
+<CmsAdapterProvider adapter={null}>
+  {children}
+</CmsAdapterProvider>
+```
+
+This keeps `useCms()` calls in client islands safe — they receive
+`null` instead of throwing — and lets you ship one codebase that can
+later add a CMS without re-architecting.
+
+## Multiple adapters
+
+There is no built-in "multi-adapter" mode. A shop with both a marketing
+CMS and a help-centre CMS should pick one as the primary (passed to this
+provider) and treat the secondary as a regular service injected through
+its own context. The Propeller surface expects a single primary CMS.

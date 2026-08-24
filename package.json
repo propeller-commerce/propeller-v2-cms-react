@@ -1,0 +1,51 @@
+{
+  "name": "@propeller-commerce/propeller-v2-cms-react",
+  "version": "0.1.5",
+  "description": "CMS page renderer + block dispatcher + adapter provider for Propeller Commerce React shops. Adapter-agnostic: you supply any CmsAdapter implementation.",
+  "license": "MIT",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "powershell -Command \"Remove-Item -Recurse -Force dist -ErrorAction SilentlyContinue\""
+  },
+  "peerDependencies": {
+    "@propeller-commerce/propeller-v2-core-ui": ">=0.2.4",
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@propeller-commerce/propeller-sdk-v2": "^0.13.0",
+    "@propeller-commerce/propeller-v2-core-ui": "^0.3.1",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5"
+  },
+  "sideEffects": false
+}

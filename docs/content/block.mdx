@@ -1,0 +1,66 @@
+---
+title: CmsBlock
+sidebar_label: Block
+sidebar_position: 5
+---
+
+# `<CmsBlock>`
+
+The single-block dispatcher used internally by
+[`<CmsPageRenderer>`](/page-renderer). Exported so consumers can render a
+block in isolation — useful for previews, partials, or CMS-driven snippets
+embedded inside a non-CMS route.
+
+```tsx
+import { CmsBlock } from 'propeller-v2-cms-react';
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+|---|---|---|---|
+| `block` | `CmsBlockShape` | yes | The block to render. |
+| `renderers` | `Record<string, CmsBlockRenderer>` | yes | Same map shape as `CmsPageRenderer`. |
+| `fallback` | `(block) => ReactNode` | no | Renders when `block.type` not in `renderers`. |
+
+## Example
+
+```tsx
+const block = { type: 'hero', data: { headline: 'Hi' } };
+
+<CmsBlock
+  block={block}
+  renderers={{ hero: (b) => <HeroBlock data={b.data} /> }}
+/>
+```
+
+## When to use this directly
+
+Most shops won't — `<CmsPageRenderer>` is the normal entry point.
+Reach for `<CmsBlock>` directly when:
+
+- You want to **inline** a single CMS block inside a non-CMS page
+  (e.g. a promotional `hero` block on the cart confirmation page).
+- You're building **preview tooling** that lets editors swap one
+  block at a time.
+- You're writing **unit tests** for a single block's rendering.
+
+## Sharing `renderers` maps
+
+A practical pattern is to define the `renderers` map once and use it both
+in the page renderer and in any standalone `<CmsBlock>` usages:
+
+```ts
+// cms/renderers.ts
+export const cmsRenderers = {
+  hero: (b) => <HeroBlock data={b.data} />,
+  text: (b) => <TextBlock html={b.data.html} />,
+  // …
+};
+
+// page.tsx
+<CmsPageRenderer page={page} renderers={cmsRenderers} />
+
+// cartConfirm.tsx
+<CmsBlock block={promoBlock} renderers={cmsRenderers} />
+```
