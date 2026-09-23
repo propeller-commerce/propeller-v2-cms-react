@@ -1,6 +1,10 @@
 {
   "name": "@propeller-commerce/propeller-v2-cms-react",
   "version": "0.1.5",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/propeller-commerce/propeller-v2-cms-react.git"
+  },
   "description": "CMS page renderer + block dispatcher + adapter provider for Propeller Commerce React shops. Adapter-agnostic: you supply any CmsAdapter implementation.",
   "license": "MIT",
   "type": "module",
