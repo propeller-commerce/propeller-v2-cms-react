@@ -9,7 +9,7 @@ sidebar_position: 3
 Wires a `CmsAdapter` instance into the React tree.
 
 ```tsx
-import { CmsAdapterProvider } from 'propeller-v2-cms-react';
+import { CmsAdapterProvider } from '@propeller-commerce/propeller-v2-cms-react';
 ```
 
 ## Props
@@ -29,7 +29,7 @@ top-level providers). Order is not significant — the CMS provider has no
 dependency on the commerce one.
 
 ```tsx
-<PropellerDepsProvider deps={deps}>
+<PropellerDepsProvider value={{ graphqlClient, services, currency, configuration }}>
   <CmsAdapterProvider adapter={cms}>
     {children}
   </CmsAdapterProvider>

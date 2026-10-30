@@ -7,6 +7,23 @@ and the project aims to follow [Semantic Versioning](https://semver.org/spec/v2.
 once it reaches 1.0. Until then (the `0.x` line) the public API may change
 between minor versions; breaking changes are called out in this file.
 
+## [0.1.6] - 2026-10-30
+
+### Changed
+
+- **Docs use the published package names (PWP-1087).** README and docs-site
+  install and import lines now name `@propeller-commerce/propeller-v2-cms-react`,
+  `@propeller-commerce/propeller-v2-core-ui` and
+  `@propeller-commerce/propeller-sdk-v2`, installed from npm. The README
+  gains an Install section.
+- **No unpublished adapters, no sign-in links (PWP-1088).** The docs site no
+  longer tells you to install a Strapi adapter package that is not on npm; it
+  points at the `CmsAdapter` contract and the CMS providers in the public Next
+  boilerplate. README links now go to the public GitHub repositories, and
+  `package.json` gains a `repository` field.
+- **Provider placement snippet matches the current React API (PWP-1086).**
+  `<PropellerDepsProvider value={{ graphqlClient, services, currency, configuration }}>`.
+
 ## [0.1.5] - 2026-08-05
 
 ### Changed

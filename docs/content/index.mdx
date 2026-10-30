@@ -8,10 +8,11 @@ slug: /
 CMS page renderer + block dispatcher + adapter provider for Propeller
 Commerce React shops.
 
-This package is the **rendering + provider layer**. The actual CMS adapter
-(Strapi, Sanity, etc.) ships as a separate `propeller-v2-cms-adapter-*`
-package, which you install alongside this one. The framework-agnostic
-`CmsAdapter` contract lives in
+This package is the **rendering + provider layer**. There is no CMS
+adapter to install from npm: write one for your CMS, or start from the
+Strapi and Prepr providers in the
+[Propeller Next boilerplate](https://github.com/propeller-commerce/propeller-v2-next-boilerplate)'s
+`lib/cms/providers`. The framework-agnostic `CmsAdapter` contract lives in
 [`propeller-v2-core-ui`](https://propeller-commerce.github.io/propeller-v2-core-ui/).
 
 ## What's here
@@ -28,10 +29,8 @@ package, which you install alongside this one. The framework-agnostic
 ## Mode-of-operation
 
 ```tsx
-import { CmsAdapterProvider, CmsPageRenderer } from 'propeller-v2-cms-react';
-import { createStrapiAdapter } from 'propeller-v2-cms-adapter-strapi';
-
-const adapter = createStrapiAdapter({ endpoint: process.env.CMS_URL! });
+import { CmsAdapterProvider, CmsPageRenderer } from '@propeller-commerce/propeller-v2-cms-react';
+import { adapter } from '@/lib/cms'; // your CmsAdapter implementation
 
 function App({ children }) {
   return (

@@ -9,19 +9,16 @@ sidebar_position: 2
 
 ```bash
 npm install \
-  github:propeller-commerce/propeller-v2-cms-react#master \
-  github:propeller-commerce/propeller-v2-core-ui#master \
-  github:propeller-commerce/propeller-sdk-v2#master
+  @propeller-commerce/propeller-v2-cms-react \
+  @propeller-commerce/propeller-v2-core-ui \
+  @propeller-commerce/propeller-sdk-v2
 ```
 
-Plus a CMS adapter package. For Strapi:
-
-```bash
-npm install --install-links file:../propeller-v2-accelerator/packages/cms-adapter-strapi
-```
-
-(Once the adapter packages are published to npm, this becomes
-`npm install propeller-v2-cms-adapter-strapi`.)
+There is no CMS adapter to install from npm. Write one against the
+[`CmsAdapter` contract](https://propeller-commerce.github.io/propeller-v2-core-ui/types#cmsadapter-contract)
+for your CMS, or start from the Strapi and Prepr providers in the
+[Propeller Next boilerplate](https://github.com/propeller-commerce/propeller-v2-next-boilerplate)'s
+`lib/cms/providers`.
 
 ## Wire the provider
 
@@ -31,13 +28,8 @@ have:
 ```tsx
 // app/providers.tsx (Next.js) or src/main.tsx (Vite/CRA)
 'use client';
-import { CmsAdapterProvider } from 'propeller-v2-cms-react';
-import { createStrapiAdapter } from 'propeller-v2-cms-adapter-strapi';
-
-const adapter = createStrapiAdapter({
-  endpoint: process.env.NEXT_PUBLIC_CMS_URL!,
-  token: process.env.NEXT_PUBLIC_CMS_TOKEN,
-});
+import { CmsAdapterProvider } from '@propeller-commerce/propeller-v2-cms-react';
+import { adapter } from '@/lib/cms';            // your CmsAdapter implementation
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -58,7 +50,7 @@ Server-side (recommended — keeps content cacheable):
 
 ```tsx
 // app/(cms)/[...slug]/page.tsx — Next.js App Router
-import { CmsPageRenderer } from 'propeller-v2-cms-react';
+import { CmsPageRenderer } from '@propeller-commerce/propeller-v2-cms-react';
 import { adapter } from '@/lib/cms';            // server-only instance
 import { notFound } from 'next/navigation';
 import { HeroBlock, TextBlock } from '@/components/cms';
@@ -84,7 +76,7 @@ Client-side via `useCms()`:
 
 ```tsx
 'use client';
-import { useCms } from 'propeller-v2-cms-react';
+import { useCms } from '@propeller-commerce/propeller-v2-cms-react';
 
 export function PreviewBanner() {
   const cms = useCms();

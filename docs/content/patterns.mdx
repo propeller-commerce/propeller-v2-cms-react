@@ -16,7 +16,7 @@ homepage route.
 
 ```tsx
 // app/page.tsx — Next.js App Router
-import { CmsPageRenderer } from 'propeller-v2-cms-react';
+import { CmsPageRenderer } from '@propeller-commerce/propeller-v2-cms-react';
 import { HomeFallback } from '@/components/home/HomeFallback';
 import { adapter } from '@/lib/cms';
 import { cmsRenderers } from '@/cms/renderers';
@@ -37,7 +37,7 @@ the adapter returns `null`, call `notFound()`. There is no generic
 ```tsx
 // app/(cms)/[...slug]/page.tsx
 import { notFound } from 'next/navigation';
-import { CmsPageRenderer } from 'propeller-v2-cms-react';
+import { CmsPageRenderer } from '@propeller-commerce/propeller-v2-cms-react';
 import { adapter } from '@/lib/cms';
 import { cmsRenderers } from '@/cms/renderers';
 
@@ -62,16 +62,16 @@ mounted at all or returns 404 for every slug.
 
 ## Preview mode
 
-The Strapi adapter (and most others) accept a `preview: true` option.
-Wire two adapter instances — one preview, one published — and pick
-which one to use based on a preview cookie:
+If your adapter supports a preview (draft) flag, wire two adapter
+instances — one preview, one published — and pick which one to use based on a preview cookie:
 
 ```ts
 // lib/cms.ts
 import { cookies } from 'next/headers';
+import { createMyCmsAdapter } from './my-cms-adapter';
 
-const publishedAdapter = createStrapiAdapter({ endpoint, preview: false });
-const previewAdapter   = createStrapiAdapter({ endpoint, preview: true });
+const publishedAdapter = createMyCmsAdapter({ endpoint, preview: false });
+const previewAdapter   = createMyCmsAdapter({ endpoint, preview: true });
 
 export function getAdapter() {
   const isPreview = cookies().get('cms-preview')?.value === '1';

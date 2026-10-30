@@ -4,7 +4,7 @@ CMS page renderer + block dispatcher + adapter provider for Propeller Commerce R
 
 📖 **Docs:** https://propeller-commerce.github.io/propeller-v2-cms-react/
 
-This package contains the **rendering + provider layer** only. It is adapter-agnostic: you supply a `CmsAdapter` implementation (the framework-agnostic contract from [propeller-v2-core-ui](https://gitlab.com/propellor-eu/cloud/frontend/ui/propeller-v2-core-ui)) and this package renders the pages it returns. There is no adapter to install from npm — write one for your CMS, or use the provider already built into the Propeller Next boilerplate's `lib/cms` (Strapi + Prepr, selected at runtime by `CMS_PROVIDER`).
+This package contains the **rendering + provider layer** only. It is adapter-agnostic: you supply a `CmsAdapter` implementation (the framework-agnostic contract from [propeller-v2-core-ui](https://github.com/propeller-commerce/propeller-v2-core-ui)) and this package renders the pages it returns. There is no adapter to install from npm — write one for your CMS, or use the providers already built into the [Propeller Next boilerplate](https://github.com/propeller-commerce/propeller-v2-next-boilerplate)'s `lib/cms` (Strapi + Prepr, selected at runtime by `CMS_PROVIDER`).
 
 ## What's in the box
 
@@ -13,11 +13,17 @@ This package contains the **rendering + provider layer** only. It is adapter-agn
 - **`<CmsPageRenderer>`** — renders a `CmsPage`'s block list.
 - **`<CmsBlock>`** — single-block dispatcher; takes a `renderers` map keyed by `block.type`.
 
+## Install
+
+```bash
+npm install @propeller-commerce/propeller-v2-cms-react @propeller-commerce/propeller-v2-core-ui @propeller-commerce/propeller-sdk-v2
+```
+
 ## Minimal usage
 
 ```tsx
-import { CmsAdapterProvider, CmsPageRenderer } from 'propeller-v2-cms-react';
-import type { CmsAdapter } from 'propeller-v2-core-ui';
+import { CmsAdapterProvider, CmsPageRenderer } from '@propeller-commerce/propeller-v2-cms-react';
+import type { CmsAdapter } from '@propeller-commerce/propeller-v2-core-ui';
 
 // Supply your own adapter — anything implementing the CmsAdapter contract
 // (getPage / getMenu / getGlobals). Wrap your CMS's SDK, or hand-roll fetch.
@@ -53,9 +59,9 @@ Block components are the shop's responsibility — this package ships no opinion
 
 ## Pair with
 
-- [propeller-v2-core-ui](https://gitlab.com/propellor-eu/cloud/frontend/ui/propeller-v2-core-ui) — the framework-agnostic `CmsAdapter` contract this package builds on.
-- [propeller-v2-react-ui](https://gitlab.com/propellor-eu/cloud/frontend/ui/propeller-v2-react-ui) — commerce components (cart, checkout, catalog).
+- [propeller-v2-core-ui](https://github.com/propeller-commerce/propeller-v2-core-ui) — the framework-agnostic `CmsAdapter` contract this package builds on.
+- [propeller-v2-react-ui](https://github.com/propeller-commerce/propeller-v2-react-ui) — commerce components (cart, checkout, catalog).
 
-> Looking for a ready-made adapter? The Propeller **Next boilerplate** ships
+> Looking for a ready-made adapter? The Propeller [**Next boilerplate**](https://github.com/propeller-commerce/propeller-v2-next-boilerplate) ships
 > Strapi and Prepr providers in its `lib/cms`, selected at runtime via the
 > `CMS_PROVIDER` env var — no separate adapter package to install.
