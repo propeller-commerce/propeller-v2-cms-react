@@ -7,6 +7,20 @@ and the project aims to follow [Semantic Versioning](https://semver.org/spec/v2.
 once it reaches 1.0. Until then (the `0.x` line) the public API may change
 between minor versions; breaking changes are called out in this file.
 
+## [0.2.0] - 2026-11-12
+
+### Fixed
+
+- **`<CmsPageRenderer>` and `<CmsBlock>` render in Server Components.**
+  The whole bundle was marked `"use client"`, so a Server Component that
+  passed a `renderers` map got "Functions cannot be passed directly to
+  Client Components" and the page returned 500. That broke the documented
+  server-side path, such as an App Router catch-all CMS route. Only
+  `<CmsAdapterProvider>` and `useCms()` are client-only now; they ship in
+  their own `"use client"` module, which the package entry re-exports.
+  Imports are unchanged. Interactive block components keep their own
+  `"use client"`.
+
 ## [0.1.6] - 2026-10-30
 
 ### Changed

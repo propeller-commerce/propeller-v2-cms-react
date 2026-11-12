@@ -46,6 +46,12 @@ type CmsBlockRenderer = (block: CmsBlock) => ReactNode;
 />
 ```
 
+## Server Components
+
+`<CmsPageRenderer>` and `<CmsBlock>` have no client directive, so a Server
+Component can render them with a `renderers` map. Blocks that need state or
+events mark themselves `'use client'`.
+
 ## What it does NOT do
 
 - **No client-side fetching.** The page must already be loaded.

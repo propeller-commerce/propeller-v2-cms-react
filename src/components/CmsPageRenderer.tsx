@@ -1,5 +1,3 @@
-'use client';
-
 import type { CmsPage, CmsRichPage } from '@propeller-commerce/propeller-v2-core-ui';
 import CmsBlock, { type CmsBlockRenderer } from './CmsBlock';
 

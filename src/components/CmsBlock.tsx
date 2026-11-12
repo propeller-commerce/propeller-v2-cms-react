@@ -1,5 +1,3 @@
-'use client';
-
 import { ReactNode } from 'react';
 import type { CmsBlock as CmsBlockShape } from '@propeller-commerce/propeller-v2-core-ui';
 
